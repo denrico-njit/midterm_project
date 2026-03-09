@@ -5,7 +5,7 @@ from decimal import Decimal
 from app.exceptions import ValidationError
 from app.operations import (
     Addition, Subtraction, Multiplication, Division,
-    FloorDivision, Modulo, Power, Percentage,
+    IntegerDivision, Modulo, Power, Percentage,
     AbsoluteDifference, Root, OperationFactory
 )
 
@@ -116,19 +116,19 @@ class TestDivision:
         assert Division().execute(Decimal('1'), Decimal('4')) == Decimal('0.25')
 
 
-# FloorDivision Tests
+# IntegerDivision Tests
 
-class TestFloorDivision:
+class TestIntegerDivision:
 
-    def test_floor_divide_positive_numbers(self):
-        assert FloorDivision().execute(Decimal('10'), Decimal('3')) == Decimal('3')
+    def test_Integer_divide_positive_numbers(self):
+        assert IntegerDivision().execute(Decimal('10'), Decimal('3')) == Decimal('3')
 
-    def test_floor_divide_negative_numbers(self):
-        assert FloorDivision().execute(Decimal('-10'), Decimal('3')) == Decimal('-4')
+    def test_integer_divide_negative_numbers(self):
+        assert IntegerDivision().execute(Decimal('-10'), Decimal('3')) == Decimal('-3')
 
-    def test_floor_divide_by_zero(self):
+    def test_integer_divide_by_zero(self):
         with pytest.raises(ValidationError, match="Division by zero is not allowed"):
-            FloorDivision().execute(Decimal('10'), Decimal('0'))
+            IntegerDivision().execute(Decimal('10'), Decimal('0'))
 
 
 # Modulo Tests
@@ -238,8 +238,8 @@ class TestOperationFactory:
     def test_create_division(self):
         assert isinstance(OperationFactory.create_operation('divide'), Division)
 
-    def test_create_floor_division(self):
-        assert isinstance(OperationFactory.create_operation('int_divide'), FloorDivision)
+    def test_create_integer_division(self):
+        assert isinstance(OperationFactory.create_operation('int_divide'), IntegerDivision)
 
     def test_create_modulo(self):
         assert isinstance(OperationFactory.create_operation('modulo'), Modulo)
