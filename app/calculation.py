@@ -62,7 +62,7 @@ class Calculation:
                 result=Decimal(data['result']),
                 timestamp=datetime.datetime.fromisoformat(data['timestamp'])
             )
-        except (KeyError, InvalidOperation, ValueError) as e:
+        except (KeyError, ValueError) as e:
             raise OperationError(f"Invalid calculation data: {str(e)}")
 
     def __str__(self) -> str:  # pragma: no cover
