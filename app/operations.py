@@ -163,11 +163,11 @@ class Division(Operation):
         return a / b
 
 
-class FloorDivision(Operation):
+class IntegerDivision(Operation):
     """
-    Floor division operation implementation.
+    Integer division operation implementation.
 
-    Performs the floor division of one number by another.
+    Performs the integer division of one number by another.
     """
 
     def validate_operands(self, a: Decimal, b: Decimal) -> None:
@@ -189,14 +189,14 @@ class FloorDivision(Operation):
     
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """
-        Perform floor division of one number by another.
+        Perform integer division of one number by another.
 
         Args:
             a (Decimal): Dividend.
             b (Decimal): Divisor.
 
         Returns:
-            Decimal: Result of the floor division.
+            Decimal: Result of the integer division.
         """
         self.validate_operands(a, b)
         return a // b
@@ -395,8 +395,8 @@ class OperationFactory:
         'subtract': Subtraction,
         'multiply': Multiplication,
         'divide': Division,
-        'floor_divide': FloorDivision,
-        'absolute_difference': AbsoluteDifference,
+        'int_divide': IntegerDivision,
+        'abs_difference': AbsoluteDifference,
         'modulo': Modulo,
         'percentage': Percentage,
         'power': Power,

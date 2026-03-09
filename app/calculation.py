@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 import datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any, Dict, Optional
 
 from app.exceptions import OperationError
@@ -62,7 +62,7 @@ class Calculation:
                 result=Decimal(data['result']),
                 timestamp=datetime.datetime.fromisoformat(data['timestamp'])
             )
-        except (KeyError, ValueError) as e:
+        except (KeyError, ValueError, InvalidOperation) as e:
             raise OperationError(f"Invalid calculation data: {str(e)}")
 
     def __str__(self) -> str:  # pragma: no cover
