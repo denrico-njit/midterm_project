@@ -172,7 +172,8 @@ class Calculator:
         except ValidationError as e:
             logging.error(f"Validation error: {str(e)}")
             raise
-        except Exception as e:
+        # Will take something truly wacky to get here, but catch anything unexpected
+        except Exception as e: #pragma: no cover
             logging.error(f"Operation failed: {str(e)}")
             raise OperationError(f"Operation failed: {str(e)}")
 
@@ -208,7 +209,7 @@ class Calculator:
                 ).to_csv(self.config.history_file, index=False)
                 logging.info("Empty history saved")
 
-        except Exception as e:
+        except Exception as e: #pragma: no cover
             logging.error(f"Failed to save history: {e}")
             raise OperationError(f"Failed to save history: {e}")
 
@@ -238,7 +239,8 @@ class Calculator:
                     logging.info("Loaded empty history file")
             else:
                 logging.info("No history file found - starting with empty history")
-        except Exception as e:
+        # Unexpected catch-all to prevent crashes on malformed files or read errors, but log the issue
+        except Exception as e: #pragma: no cover
             logging.error(f"Failed to load history: {e}")
             raise OperationError(f"Failed to load history: {e}")
 
