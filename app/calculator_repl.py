@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 import logging
+import textwrap
 
 from app.calculator import Calculator
 from app.exceptions import OperationError, ValidationError
@@ -30,19 +31,35 @@ def calculator_repl():
 
                 if command == 'help':
                     print("\nAvailable commands:")
-                    print("\n  Operations:")
-                    for op in OperationFactory._operations.keys():
-                        print(f"    {op}")
-                    print("\n  History:")
-                    print("    history - Show calculation history")
-                    print("    clear   - Clear calculation history")
-                    print("    undo    - Undo the last calculation")
-                    print("    redo    - Redo the last undone calculation")
-                    print("    save    - Save calculation history to file")
-                    print("    load    - Load calculation history from file")
-                    print("\n  Other:")
-                    print("    help    - Show this help message")
-                    print("    exit    - Exit the calculator")
+                    print("\n  Operations:\n")
+                    # Plan for 80 character terminal width
+                    print(f"    {'Command':<15} {'Description':<45} {'Example'}")
+                    print(f"    {'-'*15} {'-'*45} {'-'*20}")
+                    for op in OperationFactory._operations.values():
+                        if hasattr(op, '_help'):
+                            h = op._help
+                            name_col = f"{h['name']:<15}"
+                            usage_col = h['usage']
+                            
+                            # Wrap description to 45 chars
+                            lines = textwrap.wrap(h['description'], width=45)
+                            
+                            # First line includes name and usage
+                            print(f"    {name_col} {lines[0]:<45} {usage_col}")
+                            
+                            # Continuation lines indent to match description column
+                            for line in lines[1:]:
+                                print(f"    {' '*15} {line}")
+                    print("\n  History:\n")
+                    print("    history         Show calculation history")
+                    print("    clear           Clear calculation history")
+                    print("    undo            Undo the last calculation")
+                    print("    redo            Redo the last undone calculation")
+                    print("    save            Save calculation history to file")
+                    print("    load            Load calculation history from file")
+                    print("\n  Other:\n")
+                    print("    help            Show this help message")
+                    print("    exit            Exit the calculator")
                     continue
                 
                 if command == 'exit':

@@ -57,7 +57,18 @@ class Operation(ABC):
         """
         return self.__class__.__name__
 
+# Decorator for giving operations metadata for dynamically generating help info
+def register_operation(name: str, description: str, usage: str):
+    def decorator(cls):
+        cls._help = {
+            'name': name,
+            'description': description,
+            'usage': usage
+        }
+        return cls
+    return decorator
 
+@register_operation('add', 'Adds two numbers together.', 'add <number1> <number2>')
 class Addition(Operation):
     """
     Addition operation implementation.
@@ -80,6 +91,7 @@ class Addition(Operation):
         return a + b
 
 
+@register_operation('subtract', 'Subtracts one number from another.', 'subtract <number1> <number2>')
 class Subtraction(Operation):
     """
     Subtraction operation implementation.
@@ -102,6 +114,7 @@ class Subtraction(Operation):
         return a - b
 
 
+@register_operation('multiply', 'Multiplies two numbers together.', 'multiply <number1> <number2>')
 class Multiplication(Operation):
     """
     Multiplication operation implementation.
@@ -124,6 +137,7 @@ class Multiplication(Operation):
         return a * b
 
 
+@register_operation('divide', 'Divides one number by another.', 'divide <number1> <number2>')
 class Division(Operation):
     """
     Division operation implementation.
@@ -163,6 +177,7 @@ class Division(Operation):
         return a / b
 
 
+@register_operation('int_divide', 'Performs integer division of one number by another. Truncates towards zero.', 'int_divide <number1> <number2>')
 class IntegerDivision(Operation):
     """
     Integer division operation implementation.
@@ -202,6 +217,7 @@ class IntegerDivision(Operation):
         return a // b
 
 
+@register_operation('modulo', 'Calculates the remainder of the division of one number by another.', 'modulo <number1> <number2>')
 class Modulo(Operation):
     """
     Modulo operation implementation.
@@ -241,6 +257,7 @@ class Modulo(Operation):
         return a % b
     
 
+@register_operation('power', 'Raises one number to the power of another.', 'power <base> <exponent>')
 class Power(Operation):
     """
     Power (exponentiation) operation implementation.
@@ -280,6 +297,7 @@ class Power(Operation):
         return a ** b
 
 
+@register_operation('percentage', 'Calculates the percentage of one number with respect to another.', 'percentage <part> <whole>')
 class Percentage(Operation):
     """
     Percentage operation implementation.
@@ -316,6 +334,7 @@ class Percentage(Operation):
         return (a / b) * Decimal(100)
 
 
+@register_operation('abs_difference', 'Calculates the absolute difference between two numbers.', 'abs_difference <number1> <number2>')
 class AbsoluteDifference(Operation):
     """
     Absolute difference operation implementation.
@@ -338,6 +357,7 @@ class AbsoluteDifference(Operation):
         return abs(a - b)
     
 
+@register_operation('root', 'Calculates the nth root of a number.', 'root <number> <degree>')
 class Root(Operation):
     """
     Root operation implementation.
