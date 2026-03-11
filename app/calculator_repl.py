@@ -5,9 +5,11 @@ import logging
 import textwrap
 
 from app.calculator import Calculator
+from app.display import print_result, print_info, print_error
 from app.exceptions import OperationError, ValidationError
 from app.history import AutoSaveObserver, LoggingObserver
 from app.operations import OperationFactory
+from app.display import print_result, print_info, print_error, format_decimal
 
 
 def calculator_repl():
@@ -31,8 +33,7 @@ def calculator_repl():
 
                 if command == 'help':
                     print("\nAvailable commands:")
-                    print("\n  Operations:\n")
-                    # Plan for 80 character terminal width
+                    print("\n  Operations:")
                     print(f"    {'Command':<15} {'Description':<45} {'Example'}")
                     print(f"    {'-'*15} {'-'*45} {'-'*20}")
                     for op in OperationFactory._operations.values():
@@ -40,80 +41,76 @@ def calculator_repl():
                             h = op._help
                             name_col = f"{h['name']:<15}"
                             usage_col = h['usage']
-                            
-                            # Wrap description to 45 chars
                             lines = textwrap.wrap(h['description'], width=45)
-                            
-                            # First line includes name and usage
                             print(f"    {name_col} {lines[0]:<45} {usage_col}")
-                            
-                            # Continuation lines indent to match description column
                             for line in lines[1:]:
                                 print(f"    {' '*15} {line}")
-                    print("\n  History:\n")
+                        else:
+                            print(f"    {op.__name__}")
+                    print("\n  History:")
                     print("    history         Show calculation history")
                     print("    clear           Clear calculation history")
                     print("    undo            Undo the last calculation")
                     print("    redo            Redo the last undone calculation")
                     print("    save            Save calculation history to file")
                     print("    load            Load calculation history from file")
-                    print("\n  Other:\n")
+                    print("\n  Other:")
                     print("    help            Show this help message")
                     print("    exit            Exit the calculator")
                     continue
-                
+
                 if command == 'exit':
                     try:
                         calc.save_history()
-                        print("History saved successfully.")
+                        print_info("History saved successfully.")
                     except Exception as e:
-                        print(f"Warning: Could not save history: {e}")
+                        print_error(f"Warning: Could not save history: {e}")
                     print("Exiting...")
                     break
 
                 if command == 'history':
                     history = calc.show_history()
                     if not history:
-                        print("No available history.")
+                        print_info("No available history.")
                     else:
                         print("\nCalculation History:")
                         for i, entry in enumerate(history, 1):
-                            print(f"{i}. {entry}")
+                            print_info(f"{i}. {entry}")
                     continue
 
                 if command == 'clear':
                     calc.clear_history()
-                    print("History cleared")
+                    print_info("History cleared")
                     continue
 
                 if command == 'undo':
                     if calc.undo():
-                        print("Operation undone")
+                        print_info("Operation undone")
                     else:
-                        print("Nothing to undo")
+                        print_info("Nothing to undo")
                     continue
 
                 if command == 'redo':
                     if calc.redo():
-                        print("Operation redone")
+                        print_info("Operation redone")
                     else:
-                        print("Nothing to redo")
+                        print_info("Nothing to redo")
                     continue
 
                 if command == 'save':
                     try:
                         calc.save_history()
-                        print("History saved successfully")
+                        print_info("History saved successfully")
                     except Exception as e:
-                        print(f"Error saving history: {e}")
+                        print_error(f"Error saving history: {e}")
                     continue
 
                 if command == 'load':
                     try:
                         calc.load_history()
-                        print("History loaded successfully")
+                        print_info("History loaded successfully")
                     except Exception as e:
-                        print(f"Error loading history: {e}")
+                        print_error(f"Error loading history: {e}")
                     continue
 
                 if command in OperationFactory._operations:
@@ -121,42 +118,41 @@ def calculator_repl():
                         print("\nEnter numbers (or 'cancel' to abort):")
                         a = input("First number: ")
                         if a.lower() == 'cancel':
-                            print("Operation cancelled")
+                            print_info("Operation cancelled")
                             continue
                         b = input("Second number: ")
                         if b.lower() == 'cancel':
-                            print("Operation cancelled")
+                            print_info("Operation cancelled")
                             continue
 
                         result = calc.calculate(command, a, b)
-                        print(f"\nResult: {result.normalize()}")
+                        print_result(f"\nResult: {format_decimal(result)}")
 
-                    # Handle interruption during input collection 
-                    except KeyboardInterrupt: #pragma: no cover - can't simulate
-                        print("\nOperation cancelled")
+                    except KeyboardInterrupt:  # pragma: no cover
+                        print_info("\nOperation cancelled")
                         continue
-                    except EOFError: #pragma: no cover - can't simulate
-                        print("\nInput terminated. Exiting...")
+                    except EOFError:  # pragma: no cover
+                        print_error("\nInput terminated. Exiting...")
                         raise
                     except (ValidationError, OperationError) as e:
-                        print(f"Error: {e}")
+                        print_error(f"Error: {e}")
                     except Exception as e:
-                        print(f"Unexpected error: {e}")
+                        print_error(f"Unexpected error: {e}")
                     continue
 
-                print(f"Unknown command: '{command}'. Type 'help' for available commands.")
+                print_error(f"Unknown command: '{command}'. Type 'help' for available commands.")
 
-            except KeyboardInterrupt:
-                print("\nOperation cancelled")
+            except KeyboardInterrupt:  # pragma: no cover
+                print_info("\nOperation cancelled")
                 continue
-            except EOFError:
+            except EOFError:  # pragma: no cover
                 print("\nInput terminated. Exiting...")
                 break
             except Exception as e:
-                print(f"Error: {e}")
+                print_error(f"Error: {e}")
                 continue
 
     except Exception as e:
-        print(f"Fatal error: {e}")
+        print_error(f"Fatal error: {e}")
         logging.error(f"Fatal error in calculator REPL: {e}")
         raise
