@@ -1,4 +1,5 @@
 import pytest
+
 from decimal import Decimal
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -13,8 +14,10 @@ from app.calculator_repl import calculator_repl
 @pytest.fixture
 def temp_config(tmp_path):
     config = CalculatorConfig(base_dir=tmp_path)
-    with patch('app.calculator_repl.Calculator') as MockCalc:
-        MockCalc.return_value = Calculator(config=config)
+    with patch('app.calculator_repl.Calculator', return_value=Calculator(config=config)), \
+         patch('app.display.Fore.GREEN', ''), \
+         patch('app.display.Fore.YELLOW', ''), \
+         patch('app.display.Fore.RED', ''):
         yield config
 
 
@@ -42,6 +45,7 @@ def test_repl_help(mock_print, mock_input, temp_config):
 @patch('builtins.print')
 def test_repl_add(mock_print, mock_input, temp_config):
     calculator_repl()
+    print(mock_print.call_args_list)  # this will go to real print since mock_print is the mock
     mock_print.assert_any_call("\nResult: 15")
 
 @patch('builtins.input', side_effect=['subtract', '10', '4', 'exit'])
@@ -151,7 +155,10 @@ def test_repl_unexpected_operation_error(mock_print, mock_input, tmp_path):
     config = CalculatorConfig(base_dir=tmp_path)
     calc_instance = Calculator(config=config)
     calc_instance.perform_operation = MagicMock(side_effect=Exception("unexpected"))
-    with patch('app.calculator_repl.Calculator', return_value=calc_instance):
+    with patch('app.calculator_repl.Calculator', return_value=calc_instance), \
+         patch('app.display.Fore.GREEN', ''), \
+         patch('app.display.Fore.YELLOW', ''), \
+         patch('app.display.Fore.RED', ''):
         calculator_repl()
         mock_print.assert_any_call("Unexpected error: unexpected")
 
@@ -209,7 +216,10 @@ def test_repl_save_failure(mock_print, mock_input, tmp_path):
     config = CalculatorConfig(base_dir=tmp_path)
     calc_instance = Calculator(config=config)
     calc_instance.save_history = MagicMock(side_effect=Exception("disk error"))
-    with patch('app.calculator_repl.Calculator', return_value=calc_instance):
+    with patch('app.calculator_repl.Calculator', return_value=calc_instance), \
+         patch('app.display.Fore.GREEN', ''), \
+         patch('app.display.Fore.YELLOW', ''), \
+         patch('app.display.Fore.RED', ''):
         calculator_repl()
         printed = [str(call) for call in mock_print.call_args_list]
         assert any("Error saving history" in p for p in printed)
@@ -229,7 +239,10 @@ def test_repl_load_failure(mock_print, mock_input, tmp_path):
     config = CalculatorConfig(base_dir=tmp_path)
     calc_instance = Calculator(config=config)
     calc_instance.load_history = MagicMock(side_effect=Exception("file error"))
-    with patch('app.calculator_repl.Calculator', return_value=calc_instance):
+    with patch('app.calculator_repl.Calculator', return_value=calc_instance), \
+         patch('app.display.Fore.GREEN', ''), \
+         patch('app.display.Fore.YELLOW', ''), \
+         patch('app.display.Fore.RED', ''):
         calculator_repl()
         printed = [str(call) for call in mock_print.call_args_list]
         assert any("Error loading history" in p for p in printed)
